@@ -7,7 +7,9 @@ import
 
 when isMainModule:
   echo(getWelcomeMessage())
-  while true:
-    var res = clReadLine("Q   ...passa? ")
-    if res.isNone:
-      break
+  clPromptColorSet(clColorE.CROSSLINE_FGCOLOR_CYAN)
+  var line = clReadLine(">> ", "Default line")
+  echo line
+  for line in  clIterateReadLine("Prompt>>"):
+    clColorSet(clColorE.CROSSLINE_FGCOLOR_MAGENTA)
+    echo(line)

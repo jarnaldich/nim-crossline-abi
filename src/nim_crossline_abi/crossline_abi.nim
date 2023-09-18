@@ -17,22 +17,22 @@ type
     CROSSLINE_BGCOLOR_BRIGHT = 0x8000, CROSSLINE_UNDERLINE = 0x10000
 
 const
-  CROSSLINE_BGCOLOR_DEFAULT = CROSSLINE_FGCOLOR_DEFAULT
-  CROSSLINE_COLOR_DEFAULT = CROSSLINE_FGCOLOR_DEFAULT
+  CROSSLINE_BGCOLOR_DEFAULT* = CROSSLINE_FGCOLOR_DEFAULT
+  CROSSLINE_COLOR_DEFAULT* = CROSSLINE_FGCOLOR_DEFAULT
 
 ##  Main API to read a line, return buf if get line, return NULL if EOF.
 
 proc crosslineReadline*(prompt: cstring; buf: cstring; size: cint): cstring {.
     importc: "crossline_readline" .}
-##  Same with crossline_readline except buf holding initial input for editing.
 
+##  Same with crossline_readline except buf holding initial input for editing.
 proc crosslineReadline2*(prompt: cstring; buf: cstring; size: cint): cstring {.
     importc: "crossline_readline2" .}
 ##  Set move/cut word delimiter, default is all not digital and alphabetic characters.
 
 proc crosslineDelimiterSet*(delim: cstring) {.importc: "crossline_delimiter_set" .}
-##  Read a character from terminal without echo
 
+##  Read a character from terminal without echo
 proc crosslineGetch*(): cint {.importc: "crossline_getch" .}
 ##
 ##  History APIs
