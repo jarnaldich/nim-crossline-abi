@@ -9,7 +9,9 @@ proc getWelcomeMessage*(): string = "Hello, World!"
 
 const CL_BUFFER_LENGTH = 512;
 
-##!! Todo: Use this as an iterator...
+##########################
+# READING LINES/CHAR API #
+##########################
 proc clReadLine*(prompt: string, initial: string = ""): Option[string] =
   var s = newString(CL_BUFFER_LENGTH);
   if initial.len > 0:
@@ -30,5 +32,34 @@ iterator clIterateReadLine*(prompt: string): string =
             break
         yield maybeLine.get()
 
-proc clColorSet*(color: CrosslineColorE) = crosslineColorSet(color)
-proc clPromptColorSet*(color: CrosslineColorE) = crosslinePromptColorSet(color)
+proc clGetCharCode*(): int = crosslineGetch().int
+proc clSetDelimiters*(del: string) = crosslineDelimiterSet(del.cstring)
+
+#############
+# COLOR API #
+#############
+proc clSetColor*(color: CrosslineColorE) = crosslineColorSet(color)
+proc clSetPromptColor*(color: CrosslineColorE) = crosslinePromptColorSet(color)
+
+
+###############
+# HISTORY API #
+###############
+proc clHistorySave*(fileName: string) {.raises: [ IOError ] .} = 
+    if crosslineHistorySave(fileName.cstring) != 0:
+        raise newException(IOError, "History save failed") 
+
+proc clHistoryLoad*(fileName: string) {.raises: [ IOError ] .} = 
+    if crosslineHistoryLoad(fileName.cstring) != 0:
+        raise newException(IOError, "History load failed") 
+
+proc clHistoryShow*() = crosslineHistoryShow()
+proc clHistoryClear*() = crosslineHistoryClear()
+
+##############
+# PAGING API #
+##############
+#XXX: I do not fully understand how to use this.
+proc clPagingCheck*(lines: int): int = crosslinePagingCheck(lines.cint).int
+
+
