@@ -11,11 +11,8 @@ import
 when isMainModule:
   echo(getWelcomeMessage())
   clSetPromptColor(clColorE.CROSSLINE_FGCOLOR_CYAN)
-  clSetDelimiters("abc")
-  var line = clReadLine(">> ", "TaTbTaTb,b,c. D ")
-  echo line
-  var c = clGetCharCode()
-  echo "Code:", c
+  echo "RC", clGetScreen()
+  echo "Cursor", clGetCursor()
   for line in  clIterateReadLine("Prompt>>"):
     clSetColor(clColorE.CROSSLINE_FGCOLOR_MAGENTA)
     echo(line)

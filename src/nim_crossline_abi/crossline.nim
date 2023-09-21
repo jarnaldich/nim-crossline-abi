@@ -3,7 +3,12 @@ import
   crossline_abi
 
 type 
-    clColorE* = CrosslineColorE;
+    clColorE* = CrosslineColorE
+    clRowsCols* = object 
+        rows*: int 
+        cols*: int
+    clCompletionFuncT* = proc(prefix: string) : seq[string];
+
 
 proc getWelcomeMessage*(): string = "Hello, World!"
 
@@ -61,5 +66,43 @@ proc clHistoryClear*() = crosslineHistoryClear()
 ##############
 #XXX: I do not fully understand how to use this.
 proc clPagingCheck*(lines: int): int = crosslinePagingCheck(lines.cint).int
+proc clEnablePaging*() = discard crosslinePagingSet(1)
+proc clDisablePaging*() = discard crosslinePagingSet(0)
+
+##############
+# CURSOR API #
+##############
+proc clGetScreen*() : clRowsCols = 
+    var rows: cint = 0;
+    var cols: cint = 0;
+    crosslineScreenGet(rows.addr, cols.addr)
+    result = clRowsCols(rows: rows.int, cols: cols.int)
+
+proc clClearScreen*() = crosslineScreenClear()
+
+proc clGetCursor*() : clRowsCols = 
+    var rows: cint = 0;
+    var cols: cint = 0;
+    discard crosslineCursorGet(rows.addr, cols.addr)
+    result = clRowsCols(rows: rows.int, cols: cols.int)
+
+proc clMoveCursor*(rows: int, cols: int) = crosslineCursorSet(rows.cint, cols.cint)
+proc clMoveCursor*(rc: clRowsCols) = clMoveCursor(rc.rows, rc.cols)
+
+proc clSetCursor*(rows: int, cols: int) = crosslineCursorSet(rows.cint, cols.cint)
+proc clSetCursor*(rc: clRowsCols) = clSetCursor(rc.rows, rc.cols)
+
+proc clHideCursor*() = crosslineCursorHide(1)
+proc clShowCursor*() = crosslineCursorHide(0)
+
+###############
+# COMPLETIONS #
+###############
+
+#proc clCompletionsAdapter(completionF: clCompletionsFuncT) : CrosslineCompletionsT = 
+#    return (proc(buf: cstring; pCompletions: ptrCrosslineCompletionsT) = 
+#
+#            )
+
 
 
