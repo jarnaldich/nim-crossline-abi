@@ -58,7 +58,7 @@ proc crosslineHistoryClear*() {.importc: "crossline_history_clear" .}
 type
   CrosslineCompletionsT* = object
   CrosslineCompletionCallback* = proc (buf: cstring;
-                                    pCompletions: ptr CrosslineCompletionsT)
+                                    pCompletions: ptr CrosslineCompletionsT) {.cdecl.}
 
 ##  Register completion callback
 

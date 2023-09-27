@@ -4,15 +4,31 @@
 import 
   std/options,
   nim_crossline_abi/crossline,
+  nim_crossline_abi/crossline_abi,
   os,
   std/sequtils,
   std/sugar
 
+
+proc completions(word: string )  : seq[clCompletion] = 
+  return [ clCompletion(
+            text: "Hola",
+            help: "Hola help",
+            hint: none(string), 
+            color: some(CROSSLINE_FGCOLOR_RED),
+            helpColor: none(clColorE),
+            hintColor: none(clColorE))].toSeq()
+
+proc completions2(buf: cstring; pCompletions: ptr CrosslineCompletionsT) {.cdecl.} = 
+  debugEcho("HOOOOOOOOO")
+  crosslineCompletionAdd(pCompletions, "PATATA", "")
+
 when isMainModule:
-  echo(getWelcomeMessage())
   clSetPromptColor(clColorE.CROSSLINE_FGCOLOR_CYAN)
   echo "RC", clGetScreen()
   echo "Cursor", clGetCursor()
+  clCompletionsRegister(completions)
+#  crosslineCompletionRegister(completions2)
   for line in  clIterateReadLine("Prompt>>"):
     clSetColor(clColorE.CROSSLINE_FGCOLOR_MAGENTA)
     echo(line)

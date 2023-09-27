@@ -7,8 +7,14 @@ type
     clRowsCols* = object 
         rows*: int 
         cols*: int
-    clCompletionFuncT* = proc(prefix: string) : seq[string];
-
+    clCompletion* = object
+        text*: string
+        help*: string
+        hint*: Option[string]
+        color*: Option[clColorE]
+        helpColor*: Option[clColorE]
+        hintColor*: Option[clColorE]
+    clCompletionsFuncT* = proc(prefix: string) : seq[clCompletion]
 
 proc getWelcomeMessage*(): string = "Hello, World!"
 
@@ -99,10 +105,35 @@ proc clShowCursor*() = crosslineCursorHide(0)
 # COMPLETIONS #
 ###############
 
-#proc clCompletionsAdapter(completionF: clCompletionsFuncT) : CrosslineCompletionsT = 
-#    return (proc(buf: cstring; pCompletions: ptrCrosslineCompletionsT) = 
-#
-#            )
+
+proc clCompletionsRegister*(compl: clCompletionsFuncT) = 
+    # This is a kind of ugly hack to compensate for the fact that:
+        # - callback functions need to be declared as .cdecl. 
+        # - cdecl cannot close over variables
+    # Since a readline library is already not reentrant, there should be no problem in
+    # using this "lexically hidden global" hack, except for general uglyness.
+    # A better alternative would be to use some sort of rawProc / rawEnv wrapper, but this
+    # is simpler and should do the work in this case...
+    var complGlobal {.global.} : clCompletionsFuncT
+    complGlobal = compl
+    proc local(buf: cstring; pCompletions: ptr CrosslineCompletionsT) {.cdecl.} =
+        for completion in complGlobal($buf):
+            if completion.color.isNone and completion.helpColor.isNone:
+                crosslineCompletionAdd(pCompletions, 
+                    completion.text.cstring, 
+                    completion.help.cstring)
+            else:
+                crosslineCompletionaddColor(pCompletions,
+                    completion.text.cstring, completion.color.get(CROSSLINE_FGCOLOR_DEFAULT),
+                    completion.help.cstring, completion.helpColor.get(CROSSLINE_FGCOLOR_DEFAULT))
+            if completion.hint.isSome and completion.hintColor.isSome:
+                crosslineHintsSetColor(pCompletions,
+                    completion.hint.get().cstring,
+                    completion.hintColor.get())
+            elif completion.hint.isSome:
+                crosslineHintsSet(pCompletions, 
+                    completion.hint.get().cstring)
+    crosslineCompletionRegister(local)
 
 
 
